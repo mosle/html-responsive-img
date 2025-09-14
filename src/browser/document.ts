@@ -16,6 +16,9 @@ export function transformDocument(config: Config): number {
   const result = responsify(html, config);
 
   if (result.success && result.html) {
+    // Prefer counting directly from transformed HTML string
+    const srcsetMatches = result.html.match(/\ssrcset=\"/g) || [];
+    const directCount = srcsetMatches.length;
     // Prefer DOMParser, but guard against environments where it may throw (e.g. some JSDOM setups)
     let applied = false;
     if (typeof DOMParser !== 'undefined') {
@@ -54,7 +57,17 @@ export function transformDocument(config: Config): number {
       }
     }
 
-    return result.stats?.imagesTransformed || 0;
+    // Prefer direct string count; if zero, fallback to stats or DOM count
+    let count = directCount || result.stats?.imagesTransformed || 0;
+    if (count === 0) {
+      try {
+        const imgs = Array.from(document.querySelectorAll('img'));
+        count = imgs.reduce((acc, img) => acc + (img.hasAttribute('srcset') ? 1 : 0), 0);
+      } catch {
+        // ignore
+      }
+    }
+    return count;
   }
 
   return 0;

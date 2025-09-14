@@ -7,15 +7,23 @@
  */
 export function isValidSelector(selector: string): boolean {
   try {
-    // Try to use the selector in a dummy context
-    if (typeof document !== 'undefined') {
-      document.createElement('div').matches(selector);
-    } else {
-      // Basic validation for Node.js environment
-      // Check for common invalid patterns
-      if (selector.startsWith('>') || selector.includes('>>>')) {
-        return false;
+    // If a real DOM API is present, try using it
+    if (
+      typeof document !== 'undefined' &&
+      typeof (document as unknown as { createElement?: unknown }).createElement === 'function'
+    ) {
+      const el = (document as Document).createElement('div');
+      const matches = (el as Element).matches as ((sel: string) => boolean) | undefined;
+      if (typeof matches === 'function') {
+        matches.call(el, selector);
       }
+      return true;
+    }
+
+    // Fallback validation for non-DOM environments (e.g., test shims)
+    // Only reject obviously invalid patterns
+    if (selector.startsWith('>') || selector.includes('>>>')) {
+      return false;
     }
     return true;
   } catch {

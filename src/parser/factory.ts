@@ -47,7 +47,6 @@ export function getParserSync(): ParserModule {
     // Default to Node.js parser in synchronous mode
     if (typeof window !== 'undefined' && typeof document !== 'undefined') {
       // In browser, we can use browser parser directly
-      // eslint-disable-next-line @typescript-eslint/no-var-requires
       const mod = require('./browser') as typeof import('./browser');
       parserModule = {
         parseHTML: mod.parseHTML,
@@ -55,7 +54,6 @@ export function getParserSync(): ParserModule {
         serializeHTML: (root: unknown) => mod.serializeHTML(root as Document | DocumentFragment)
       } satisfies ParserModule;
     } else {
-      // eslint-disable-next-line @typescript-eslint/no-var-requires
       const mod = require('./index') as typeof import('./index');
       parserModule = {
         parseHTML: mod.parseHTML,
