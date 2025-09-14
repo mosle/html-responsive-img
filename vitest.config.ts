@@ -5,6 +5,7 @@ export default defineConfig({
   test: {
     globals: true,
     environment: 'node',
+    setupFiles: [resolve(__dirname, './tests/setup/polyfills.ts')],
     coverage: {
       provider: 'v8',
       reporter: ['text', 'json', 'html'],
@@ -27,7 +28,9 @@ export default defineConfig({
   },
   resolve: {
     alias: {
-      '@': resolve(__dirname, './src')
+      '@': resolve(__dirname, './src'),
+      // Shim jsdom to avoid import-time issues on Node 18
+      jsdom: resolve(__dirname, './tests/shims/jsdom.ts')
     }
   }
 });
