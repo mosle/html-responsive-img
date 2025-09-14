@@ -113,7 +113,7 @@ export interface ImageElement {
   /** CSS selector that matched this image */
   selector: string;
   /** The HTML element reference (if available) */
-  element?: any;
+  element?: unknown;
 }
 
 /**

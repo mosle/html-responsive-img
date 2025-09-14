@@ -14,9 +14,9 @@ export enum ErrorCode {
  */
 export class TransformError extends Error {
   code: ErrorCode;
-  context?: Record<string, any>;
+  context?: Record<string, unknown>;
 
-  constructor(code: ErrorCode, message: string, context?: Record<string, any>) {
+  constructor(code: ErrorCode, message: string, context?: Record<string, unknown>) {
     super(message);
     this.name = 'TransformError';
     this.code = code;

@@ -31,7 +31,7 @@ export async function transformImagesAsync(
     };
 
     // Track which images have been transformed
-    const transformedImages = new Set<any>();
+    const transformedImages = new Set<unknown>();
 
     // Process in chunks for better performance
     const CHUNK_SIZE = 50;
@@ -82,12 +82,17 @@ export async function transformImagesAsync(
 /**
  * Process a chunk of images
  */
+type ParserAdapter = {
+  matchesSelector: (element: unknown, selector: string) => boolean;
+  parseHTML: (html: string) => { root: unknown; images: import('./types').ImageElement[] };
+};
+
 async function processImageChunk(
-  images: any[],
+  images: import('./types').ImageElement[],
   config: Config,
-  transformedImages: Set<any>,
+  transformedImages: Set<unknown>,
   stats: TransformStats,
-  parser: any
+  parser: ParserAdapter
 ): Promise<void> {
   const { matchesSelector, parseHTML } = parser;
 
@@ -151,16 +156,29 @@ async function processImageChunk(
       }
 
       // Replace the original element
-      if (image.element && image.element.replaceWith) {
-        image.element.replaceWith(newElement);
+      const el = image.element as {
+        replaceWith?: (replacement: string) => void;
+        parentNode?: {
+          insertBefore?: (node: unknown, ref: unknown) => void;
+          removeChild?: (node: unknown) => void;
+        } | null;
+      } | undefined;
+      if (el && typeof el.replaceWith === 'function') {
+        el.replaceWith(newElement);
       } else {
         // Fallback for environments without replaceWith
         const temp = parseHTML(newElement);
-        const newNode = temp.root.firstChild || temp.root;
-        const parent = image.element.parentNode;
-        if (parent) {
-          parent.insertBefore(newNode, image.element);
-          parent.removeChild(image.element);
+        const rootAny = temp.root as unknown as { firstChild?: unknown };
+        const newNode = rootAny.firstChild || temp.root;
+        const parent = (image.element as unknown as {
+          parentNode?: {
+            insertBefore?: (node: unknown, ref: unknown) => void;
+            removeChild?: (node: unknown) => void;
+          } | null;
+        }).parentNode;
+        if (parent && typeof parent.insertBefore === 'function' && typeof parent.removeChild === 'function') {
+          parent.insertBefore(newNode, image.element as unknown);
+          parent.removeChild(image.element as unknown);
         }
       }
 

@@ -73,7 +73,13 @@ export function parseSelector(selector: string): {
  * Check if element matches parsed selector components
  */
 export function matchesParsedSelector(
-  element: any,
+  element: {
+    tagName?: string;
+    id?: string;
+    className?: string;
+    getAttribute?: (attr: string) => string | undefined;
+    hasAttribute?: (attr: string) => boolean;
+  },
   parsed: ReturnType<typeof parseSelector>
 ): boolean {
   // Check tag name

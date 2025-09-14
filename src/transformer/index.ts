@@ -24,8 +24,7 @@ export function transformImages(html: string, config: Config): TransformResult {
     };
 
     // Track which images have been transformed
-    const transformedImages = new Set<any>();
-    let extractionFailures = 0;
+    const transformedImages = new Set<unknown>();
 
     // Apply each transformation rule
     for (const transform of config.transforms) {
@@ -50,7 +49,6 @@ export function transformImages(html: string, config: Config): TransformResult {
         // Extract URL components
         const extractedData = extractUrlComponents(image.src, transform.extract);
         if (!extractedData) {
-          extractionFailures++;
           continue;
         }
 
@@ -96,24 +94,30 @@ export function transformImages(html: string, config: Config): TransformResult {
             // Try to parse the new element and replace
             const tempRoot = parseHTML(newElement);
             // Get the first child which is our new element
-            const replacement = tempRoot.root.firstChild || tempRoot.root;
+            const rootNode = tempRoot.root as unknown as { firstChild?: unknown; toString?: () => string };
+            const replacement = (rootNode.firstChild as unknown) || tempRoot.root;
 
             // Use node-html-parser's replacement method
-            if (image.element.replaceWith) {
-              image.element.replaceWith(replacement.toString());
-            } else if (image.element.parentNode) {
+            const el = image.element as {
+              replaceWith?: (replacement: string) => void;
+              parentNode?: { childNodes: unknown[] } | null;
+            };
+            if (typeof el.replaceWith === 'function') {
+              const repObj = replacement as { toString?: () => string };
+              const replacementStr = typeof repObj.toString === 'function' ? repObj.toString() : String(replacement);
+              el.replaceWith(replacementStr);
+            } else if (el.parentNode) {
               // Manual replacement
-              const parent = image.element.parentNode;
-              const index = parent.childNodes.indexOf(image.element);
+              const parent = el.parentNode;
+              const index = parent.childNodes.indexOf(image.element as unknown);
               if (index !== -1) {
                 parent.childNodes[index] = replacement;
               }
             }
           } catch {
             // If parsing fails, try direct string replacement
-            if (image.element.replaceWith) {
-              image.element.replaceWith(newElement);
-            }
+            const el = image.element as { replaceWith?: (replacement: string) => void };
+            if (typeof el.replaceWith === 'function') el.replaceWith(newElement);
           }
         }
 

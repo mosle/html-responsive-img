@@ -105,36 +105,34 @@ export async function responsifyAsync(
 }
 
 // Type guards
-export function isTransformConfig(value: any): value is import('./types').TransformConfig {
+export function isTransformConfig(value: unknown): value is import('./types').TransformConfig {
+  if (typeof value !== 'object' || value === null) return false;
+  const v = value as Record<string, unknown>;
   return (
-    typeof value === 'object' &&
-    value !== null &&
-    typeof value.selector === 'string' &&
-    typeof value.extract === 'object' &&
-    typeof value.urlTemplate === 'string' &&
-    Array.isArray(value.widths) &&
-    (value.type === 'picture' || value.type === 'srcset')
+    typeof v.selector === 'string' &&
+    typeof v.extract === 'object' && v.extract !== null &&
+    typeof v.urlTemplate === 'string' &&
+    Array.isArray(v.widths as unknown[]) &&
+    (v.type === 'picture' || v.type === 'srcset')
   );
 }
 
-export function isConfig(value: any): value is Config {
-  return (
-    typeof value === 'object' &&
-    value !== null &&
-    Array.isArray(value.transforms) &&
-    value.transforms.length > 0 &&
-    value.transforms.every(isTransformConfig)
-  );
+export function isConfig(value: unknown): value is Config {
+  if (typeof value !== 'object' || value === null) return false;
+  const v = value as Record<string, unknown>;
+  const transforms = v.transforms as unknown[];
+  return Array.isArray(transforms) && transforms.length > 0 && transforms.every(isTransformConfig);
 }
 
-export function isExtractConfig(value: any): value is import('./types').ExtractConfig {
+export function isExtractConfig(value: unknown): value is import('./types').ExtractConfig {
   if (typeof value !== 'object' || value === null) {
     return false;
   }
 
   // Must have either pattern+groups OR custom function
-  const hasPattern = value.pattern instanceof RegExp && typeof value.groups === 'object';
-  const hasCustom = typeof value.custom === 'function';
+  const v = value as Record<string, unknown>;
+  const hasPattern = v.pattern instanceof RegExp && typeof v.groups === 'object' && v.groups !== null;
+  const hasCustom = typeof v.custom === 'function';
 
   return hasPattern || hasCustom;
 }

@@ -16,7 +16,13 @@ export const transformElement = transformEl;
 
 // Make available on window object if in browser
 if (typeof window !== 'undefined') {
-  (window as any).HtmlResponsiveImg = {
+  const w = window as Window & {
+    HtmlResponsiveImg?: {
+      transformDocument: typeof transformDoc;
+      transformElement: typeof transformEl;
+    };
+  };
+  w.HtmlResponsiveImg = {
     transformDocument: transformDoc,
     transformElement: transformEl
   };

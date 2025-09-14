@@ -32,7 +32,12 @@ export function preserveAttributes(
 /**
  * Extract specific attributes from an element
  */
-export function extractAttributes(element: any): Record<string, string> {
+type ElementLike = {
+  attributes?: Record<string, string>;
+  attrs?: Array<{ name: string; value: string }>;
+};
+
+export function extractAttributes(element: ElementLike): Record<string, string> {
   const attributes: Record<string, string> = {};
 
   if (element.attributes) {
