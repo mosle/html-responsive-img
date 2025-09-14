@@ -1,0 +1,47 @@
+# Source files
+src/
+tests/
+specs/
+
+# Config files
+.github/
+.husky/
+.vscode/
+*.config.js
+*.config.ts
+tsconfig.json
+tsconfig.*.json
+.eslintrc*
+.prettierrc*
+.editorconfig
+
+# Development files
+coverage/
+.nyc_output/
+*.log
+*.tsbuildinfo
+.DS_Store
+node_modules/
+
+# Git files
+.git/
+.gitignore
+
+# Documentation source
+docs/
+*.md
+!README.md
+
+# Test files
+*.test.ts
+*.test.js
+*.spec.ts
+*.spec.js
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+
+# Build artifacts that shouldn't be published
+*.map
