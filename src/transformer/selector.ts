@@ -50,28 +50,33 @@ export function parseSelector(selector: string): {
     attributes: {}
   };
 
+  // Remove attribute selectors for tag/id/class parsing
+  const withoutAttrs = selector.replace(/\[[^\]]*\]/g, '');
+
   // Extract tag name
-  const tagMatch = selector.match(/^([a-zA-Z][a-zA-Z0-9]*)/);
+  const tagMatch = withoutAttrs.match(/^([a-zA-Z][a-zA-Z0-9]*)/);
   if (tagMatch) {
     result.tagName = tagMatch[1];
   }
 
   // Extract ID
-  const idMatch = selector.match(/#([^.\s\[]+)/);
+  const idMatch = withoutAttrs.match(/#([^.\s\[]+)/);
   if (idMatch) {
     result.id = idMatch[1];
   }
 
-  // Extract classes
-  const classMatches = selector.matchAll(/\.([^.\s\[#]+)/g);
+  // Extract classes (CSS identifiers): start with letter/_ then letters/digits/-/_
+  const classMatches = withoutAttrs.matchAll(/\.([_a-zA-Z][_a-zA-Z0-9-]*)/g);
   for (const match of classMatches) {
     result.classes.push(match[1]);
   }
 
   // Extract attributes
-  const attrMatches = selector.matchAll(/\[([^=\]]+)(?:="([^"]+)")?\]/g);
+  const attrMatches = selector.matchAll(/\[([^=\]]+)(?:=(?:\"([^\"]*)\"|'([^']*)'))?\]/g);
   for (const match of attrMatches) {
-    result.attributes[match[1]] = match[2] || '';
+    const name = match[1];
+    const value = (match[2] !== undefined ? match[2] : (match[3] !== undefined ? match[3] : '')) as string;
+    result.attributes[name] = value;
   }
 
   return result;
