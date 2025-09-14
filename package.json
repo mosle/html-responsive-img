@@ -1,6 +1,6 @@
 {
   "name": "html-responsive-img",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "Transform HTML img tags to responsive picture elements or srcset attributes",
   "keywords": [
     "responsive",
