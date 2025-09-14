@@ -96,8 +96,11 @@ describe('CLI Interface', () => {
 
       const exitCode = await cli(args);
 
+      // Read current package version to assert dynamically
+      const pkgJson = JSON.parse(await fs.readFile(path.join(process.cwd(), 'package.json'), 'utf-8')) as { version?: string };
+
       expect(exitCode).toBe(0);
-      expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining('0.1.0'));
+      expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining(pkgJson.version ?? ''));
       consoleSpy.mockRestore();
     });
 
