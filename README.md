@@ -151,12 +151,48 @@ Available presets:
 
 ## Browser Usage
 
+When using this library in the browser, import from `html-responsive-img/browser`.
+
+- For whole-page transforms: use `transformDocument(config)`; it reads the current `document` HTML and updates the DOM.
+- For a specific container: use `transformElement(element, config)`.
+- For transforming an HTML string: use `responsify(html, config)` from the browser entry and apply the result yourself.
+
+Note: The top-level import `html-responsive-img` targets Node.js and depends on `node-html-parser`. In browser code, always import from `html-responsive-img/browser`.
+
 ```html
 <script type="module">
   import { transformDocument } from 'html-responsive-img/browser';
 
   const config = { /* ... */ };
   transformDocument(config);
+</script>
+```
+
+### Transform a specific element (browser)
+
+```html
+<script type="module">
+  import { transformElement } from 'html-responsive-img/browser';
+
+  const config = { /* ... */ };
+  const container = document.querySelector('#content');
+  if (container) transformElement(container, config);
+</script>
+```
+
+### Transform a string and apply (browser)
+
+```html
+<script type="module">
+  import { responsify } from 'html-responsive-img/browser';
+
+  const config = { /* ... */ };
+  const html = `<div><img class="hero" src="/images/photo.jpg"></div>`;
+  const result = responsify(html, config);
+  if (result.success && result.html) {
+    document.getElementById('app').innerHTML = result.html;
+  }
+  // result.stats contains counters like imagesTransformed
 </script>
 ```
 
