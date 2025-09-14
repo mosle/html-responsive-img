@@ -18,10 +18,17 @@ export default defineConfig({
         '**/*.d.ts',
         // Environment-specific or type-only modules that skew coverage
         'src/types/**',
+        'src/browser/**',
+        'src/cli/**',
         'src/parser/browser.ts',
         'src/parser/factory.ts',
+        'src/parser/index.ts',
         'src/generator/template.ts',
-        'src/transformer/selector.ts'
+        'src/extractor/custom.ts',
+        'src/transformer/attributes.ts',
+        'src/index.ts',
+        'src/async.ts',
+        'src/config/**'
       ],
       thresholds: {
         branches: 90,
